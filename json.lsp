@@ -1,39 +1,28 @@
-;; @module Json
-;; @author Jeff Ober <jeffober@gmail.com>, Kanen Flowers <kanendosei@gmail.com>
-;; @version 2.0
-;; @location http://static.artfulcode.net/newlisp/json.lsp
-;; @package http://static.artfulcode.net/newlisp/json.qwerty
-;; @description JSON parser and encoder; requires util.lsp (updated for newlisp 10)
-;; <p>Library for parsing JSON data and serializing lisp into JSON.</p>
-;; <h4>Version history</h4>
-;; <b>2.0</b>
-;; &bull; completely rewrite of decoder (thanks to Andrew Pennebaker for pointing out the bugs in the original)
-;; 
-;; <b>1.2</b>
-;; &bull; fixed incompatibilities with newlisp 10
-;; 
-;; <b>1.1</b>
-;; &bull; added simple escape routine to outputted string values
-;; 
-;; <b>1.0</b>
-;; &bull; initial release
+; @module Json
+; @author Jeff Ober <jeffober@gmail.com>, Kanen Flowers <kanendosei@gmail.com>
+; @version 2.1
+; @location https://raw.github.com/kanendosei/artful-newlisp/master/json.lsp
+; @package  https://raw.github.com/kanendosei/artful-newlisp/master/json.qwerty
+; @description JSON parser and encoder
+; <p>Library for parsing JSON data and serializing lisp into JSON.</p>
+;
 
 (context 'Json)
 
-;; @syntax (Json:lisp->json <expr>)
-;; @param <expr> expression to be converted to JSON
-;; <p>Converts expression <expr> to JSON.  Association lists and
-;; contexts are converted into objects.  Other lists and arrays are
-;; converted into JSON arrays.</p>
-;; @example
-;; (Json:lisp->json '((a 1) (b 2)))
-;; => "{ 'A': 1, 'b': 2 }"
-;; (Json:lisp->json '(1 2 3 4 5))
-;; => "[1, 2, 3, 4, 5]"
-(define (lisp->json lisp)
+; @syntax (Json:Lisp->Json <expr>)
+; @param <expr> expression to be converted to JSON
+; <p>Converts expression <expr> to JSON.  Association lists and
+; contexts are converted into objects.  Other lists and arrays are
+; converted into JSON arrays.</p>
+; @example
+; (Json:Lisp->Json '((a 1) (b 2)))
+; => "{ 'A': 1, 'b': 2 }"
+; (Json:Lisp->Json '(1 2 3 4 5))
+; => "[1, 2, 3, 4, 5]"
+(define (Lisp->Json lisp)
   (case (type-of lisp)
     ("boolean" (if lisp "true" "false"))
-    ("quote" (lisp->json (eval lisp)))
+    ("quote" (Lisp->Json (eval lisp)))
     ("symbol" (format "'%s'" (name lisp)))
     ("string" (format "'%s'" (simple-escape lisp)))
     ("integer" (string lisp))
@@ -45,36 +34,36 @@
                                              (if (symbol? (pair 0))
                                                  (name (pair 0))
                                                  (string (pair 0)))
-                                             (lisp->json (pair 1))))
+                                             (Lisp->Json (pair 1))))
                                    lisp)
                               ", "))
-                (string "[" (join (map lisp->json lisp) ", ") "]")))
-    ("array" (string "[" (join (map lisp->json lisp) ", ") "]"))
+                (string "[" (join (map Lisp->Json lisp) ", ") "]")))
+    ("array" (string "[" (join (map Lisp->Json lisp) ", ") "]"))
     ("context" (let ((values '()))
                  (dotree (s lisp)
                    (push (format "'%s': %s"
                                  (name s)
-                                 (lisp->json (eval s)))
+                                 (Lisp->Json (eval s)))
                          values -1))
                  (format "{ %s }" (join values ", "))))
-    (true (throw-error (format "invalid lisp->json type: %s" lisp)))))
+    (true (throw-error (format "invalid Lisp->Json type: %s" lisp)))))
 
 (define (simple-escape str)
   (replace {[\n\r]+} str {\n} 4)
   (replace {'} str {\'} 4)
   str)
 
-;; @syntax (Json:json->lisp <str-json>)
-;; @param <str-json> a valid JSON string
-;; <p>Parses a valid JSON string and returns a lisp structure.
-;; Arrays are converted to lists and objects are converted to 
-;; assocation lists.</p>
-;; @example
-;; (Json:json->lisp "[1, 2, 3, 4]")
-;; => (1 2 3 4)
-;; (Json:json->lisp "{ 'x': 3, 'y': 4, 'z': [1, 2, 3] }")
-;; => (("x" 3) ("y" 4) ("z" (1 2 3)))
-(define (json->lisp json)
+; @syntax (Json:Json->Lisp <str-json>)
+; @param <str-json> a valid JSON string
+; <p>Parses a valid JSON string and returns a lisp structure.
+; Arrays are converted to lists and objects are converted to
+; assocation lists.</p>
+; @example
+; (Json:Json->Lisp "[1, 2, 3, 4]")
+; => (1 2 3 4)
+; (Json:Json->Lisp "{ 'x': 3, 'y': 4, 'z': [1, 2, 3] }")
+; => (("x" 3) ("y" 4) ("z" (1 2 3)))
+(define (Json->Lisp json)
   (first (lex (tokenize json))))
 
 (define number-re (regex-comp {^([-+\deE.]+)} 1))
@@ -140,9 +129,9 @@
      (tokenize tail acc))))
 
 (define (lex tokens, (tree '()) (loc '(-1)) (depth 0) (mark 0))
-  ;; Note: mark is used to match colon-pairings' depth against the current
-  ;; depth to prevent commas in a paired value (e.g. foo: [...] or foo: {})
-  ;; from popping the stack.
+  ; Note: mark is used to match colon-pairings' depth against the current
+  ; depth to prevent commas in a paired value (e.g. foo: [...] or foo: {})
+  ; from popping the stack.
   (unless (find (first tokens) '(OPEN_BRACKET OPEN_BRACE))
     (throw-error "A JSON object must be an object or array."))
   (dolist (tok tokens)
