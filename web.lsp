@@ -1,9 +1,9 @@
 #!/usr/bin/newlisp
 ;; @module Web
-;; @author Jeff Ober <jeffober@gmail.com>, Kanen Flowers <kanendosei@gmail.com>, Kanen Flowers <kanendosei@gmail.com>
-;; @version 0.3.2
+;; @author Jeff Ober <jeffober@gmail.com>, Kanen Flowers <kanendosei@gmail.com>
+;; @version 0.3.3
 ;; @location http://www.ScruffyThinking.com/artful
-;; @package https://github.com/LifeZero/artful-newlisp/blob/master/web.qwerty
+;; @package https://github.com/kanendosei/artful-newlisp/blob/master/web.qwerty
 ;; @description A collection of functions for writing web-based software.
 ;; <b>Features:</b>
 ;; <ul>
@@ -20,7 +20,7 @@
 ;; <b>Known issues</b>
 ;; <ul>
 ;;   <li>
-;;     When used in conjunction with the official 
+;;     When used in conjunction with the official
 ;;     @link http://newlisp.nfshost.com/code/modules/cgi.lsp.html CGI
 ;;     module, @link http://newlisp.nfshost.com/code/modules/cgi.lsp.html CGI must be loaded first. In the case of
 ;;     identical GET and POST parameters, the value is stored in GET, but the value will be POST. This
@@ -28,9 +28,9 @@
 ;;     GET values with POST.
 ;;   </li>
 ;; </ul>
-;; 
+;;
 ;; <b>Note:</b> for JSON encoding and decoding, see the @link http://static.artfulcode.net/newlisp/json.lsp.html Json module.
-;; 
+;;
 ;; <h4>To do</h4>
 ;; &bull; add MIME decoding for multipart posts
 ;;
@@ -41,16 +41,16 @@
 ;; <b>0.3</b>
 ;; &bull; made parse-query more tolerant and fixed parsing bug
 ;; &bull; cookie now accepts an additional parameter that only permits access during HTTPS sessions
-;; 
+;;
 ;; <b>0.2</b>
 ;; &bull; build-url now accepts query strings in addition to assoc lists
 ;; &bull; session-id now accepts an optional parameter to set the session id
 ;; &bull; fixed some typos with 'clean-sessions'
 ;; &bull; fixed extra parameter in 'define-session-handlers'
-;; 
+;;
 ;; <b>0.1</b>
 ;; &bull; initial release
-;; 
+;;
 (context 'Web)
 
 ;===============================================================================
@@ -86,7 +86,7 @@
     (list 183 {&middot;})    (list 184 {&cedil;})     (list 185 {&sup1;})      (list 186 {&ordm;})
     (list 187 {&raquo;})     (list 188 {&frac14;})    (list 189 {&frac12;})    (list 190 {&frac34;})
     (list 191 {&iquest;})    (list 192 {&Agrave;})    (list 193 {&Aacute;})    (list 194 {&Acirc;})
-    (list 195 {&Atilde;})    (list 196 {&Auml;})      (list 197 {&Aring;})     (list 198 {&AElig;}) 
+    (list 195 {&Atilde;})    (list 196 {&Auml;})      (list 197 {&Aring;})     (list 198 {&AElig;})
     (list 199 {&Ccedil;})    (list 200 {&Egrave;})    (list 201 {&Eacute;})    (list 202 {&Ecirc;})
     (list 203 {&Euml;})      (list 204 {&Igrave;})    (list 205 {&Iacute;})    (list 206 {&Icirc;})
     (list 207 {&Iuml;})      (list 208 {&ETH;})       (list 209 {&Ntilde;})    (list 210 {&Ograve;})
@@ -193,7 +193,7 @@
 ;; @param <str> a string to escape
 ;; @return the escaped string
 ;; <p>Escapes characters with a much larger set of character entities than
-;; 'escape' using a table derived from 
+;; 'escape' using a table derived from
 ;; @link http://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references Wikipedia.
 (define (encode-entities str , ent (buf ""))
   (dostring (c str)
@@ -266,7 +266,7 @@
 ;; <p>Parses a URL and returns an association list of its decomposed parts. The list's
 ;; keys (as strings) are: scheme, user, pass, host, port, path, query, and fragment.
 ;; Also handles IPV6 addresses. Modeled on the PHP function of the same name.</p>
-;; 
+;;
 ;; Parsing based on code from @link http://us3.php.net/manual/en/function.parse-url.php#90365 this&nbsp;comment.
 (constant 'REGEX_URL
   (regex-comp
@@ -308,7 +308,7 @@
 ;; @syntax (Web:build-url <str-url> [<list-query-params> ...])
 ;; @param <str-url> a string URL
 ;; @param <list-query-params> one or more association lists of query parameters and their values
-;; 
+;;
 ;; @syntax (Web:build-url <list-url> [<list-query-params> ...])
 ;; @param <list-url> an association list of URL components using the structure of <parse-url>'s return value
 ;; @param <list-query-params> one or more association lists of query parameters and their values
@@ -333,7 +333,7 @@
         (if (assoc (first pair) params)
           (setf (assoc (first pair) params) pair)
           (push pair params))))
-    
+
     (format "%s://%s%s%s%s%s%s"
       (or (lookup "scheme" url) "http")
       (cond
@@ -381,7 +381,7 @@
 
 ;; @syntax (Web:cookie <str-key>)
 ;; @param <str-key> the cookie's name
-;; 
+;;
 ;; @syntax (Web:cookie <str-key> <str-value> [<int-expires> [<str-path> [<str-domain> [<bool-http-only> [<bool-secure-only>]]]])
 ;; @param <str-key> the cookie's name
 ;; @param <str-key> the cookie's value
@@ -546,7 +546,7 @@
 
 ;===============================================================================
 ; !Default session handlers
-; 
+;
 ; The default session handlers use newLISP's 'save' and 'load' functions to
 ; easily serialize and import context data to and from file records. The files
 ; are stored unencrypted, so a custom handler should be used on a shared
@@ -607,7 +607,7 @@
 (define (eval-template str (ctx MAIN) , start end next-start next-end block (buf ""))
   (setf start (find OPEN_TAG str))
   (setf end (find CLOSE_TAG str))
-  
+
   ;; Prevent use of code island tags inside code island from breaking parsing.
   (when (and start end)
     (while (and (setf next-end (find CLOSE_TAG (slice str (+ end 2))))
@@ -615,7 +615,7 @@
                 (< next-end next-start))
       (inc end (+ next-end 2)))
     (when (and start (not end)) (throw-error "Unbalanced tags.")))
-  
+
   (while (and start end)
     (write-buffer buf (string "(print [text]" (slice str 0 start) "[/text])"))
     (setf block (slice str (+ start 2) (- end start 2)))
@@ -625,7 +625,7 @@
     (setf str (slice str (+ end 2)))
     (setf start (find OPEN_TAG str))
     (setf end (find CLOSE_TAG str))
-    
+
     ;; Prevent use of code island tags inside code island from breaking parsing.
     (when (and start end)
       (while (and (setf next-end (find CLOSE_TAG (slice str (+ end 2))))
@@ -633,13 +633,13 @@
                   (< next-end next-start))
         (inc end (+ next-end 2)))
       (when (and start (not end)) (throw-error "Unbalanced tags."))))
-  
+
   (write-buffer buf (string "(print [text]" str "[/text])"))
   (eval-string buf ctx))
 
 ;===============================================================================
 ; !Module initialization
-; 
+;
 ; Install default session handlers and create the GET, POST, and COOKIE data
 ; structures.
 ;===============================================================================
@@ -673,9 +673,11 @@
 ; Read POST data
 (if-not (context? CGI)
   ;; CGI module not present; read and parse the POST data ourselves
-  (let ((post "") (buffer ""))
-    (if (true? (env "CONTENT_LENGTH"))
-      (read (device) post (integer (env "CONTENT_LENGTH"))))
+  (let ((post "") (buffer "") (recvd 0) (conln 0))
+    (when (true? (set 'conln (int (env "CONTENT_LENGTH"))))
+      (do-while (< recvd conln)
+                (inc recvd (read (device) buffer conln))
+                (write post buffer)))
     (setf POST (when post (parse-query post))))
 
 ;This will replace the above line once mim-decode actually works.
@@ -684,7 +686,7 @@
 ;  (if (env "CONTENT_TYPE")
 ;   (mime-decode post)
 ;   (parse-query post)))))
-  
+
   ;; CGI module present; try to guess which values in CGI:params are
   ;; from GET and which are from POST.
   (begin
