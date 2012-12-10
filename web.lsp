@@ -676,7 +676,7 @@
   (let ((post "") (buffer "") (recvd 0) (conln 0))
     (when (true? (set 'conln (int (env "CONTENT_LENGTH"))))
       (do-while (< recvd conln)
-                (inc recvd (read (device) buffer conln))
+                (inc recvd (read (device) buffer (- conln recvd)))
                 (write post buffer)))
     (setf POST (when post (parse-query post))))
 
