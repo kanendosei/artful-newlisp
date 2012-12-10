@@ -360,7 +360,7 @@
 
 (define (header key value)
   (if (lookup key headers)
-    (setf (assoc key headers) value)
+    (setf (assoc key headers) (list key value))
     (push (list key value) headers -1)))
 
 ;; @syntax (Web:redir <str-url>)
