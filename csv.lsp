@@ -27,9 +27,7 @@
 		  delimiter))
 
 (define (CSV:regex-token-empty delimiter)
-  (format "^%s(?:%s|$)"
-		  delimiter
-		  delimiter))
+  (format "^%s" delimiter))
 
 ; @syntax (CSV:make-row-parser <str-delimiter> <str-quote-char>)
 ; @param <str-delimiter> column delimiter
